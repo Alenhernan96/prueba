@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Servicio técnico en San Miguel especializado en reparación de celulares, notebooks, consolas y más. Calidad, rapidez y garantía con Tecno CF."
+    />
+    <meta
+      name="keywords"
+      content="reparación celulares, San Miguel, servicio técnico, notebooks, consolas, Tecno CF"
+    />
+    <title>Tecno CF - Inicio</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/estilo.css') }}"
+    />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    {% include 'header.html' %}
+
+    <section class="hero" id="inicio">
+      <div id="particles-js"></div>
+      <div class="hero-content">
+        <div class="hero-texto" id="heroTextoEscritura"></div>
+        <div class="hero-imagen carrusel-hero">
+          <img
+            src="{{ url_for('static', filename='img/hero1.png') }}"
+            class="slide activo"
+            alt="Slide 1"
+          />
+          <img
+            src="{{ url_for('static', filename='img/hero2.png') }}"
+            class="slide"
+            alt="Slide 2"
+          />
+          <img
+            src="{{ url_for('static', filename='img/hero3.png') }}"
+            class="slide"
+            alt="Slide 3"
+          />
+          <img
+            src="{{ url_for('static', filename='img/hero4.png') }}"
+            class="slide"
+            alt="Slide 4"
+          />
+          <img
+            src="{{ url_for('static', filename='img/hero5.png') }}"
+            class="slide"
+            alt="Slide 5"
+          />
+          <img
+            src="{{ url_for('static', filename='img/hero6.png') }}"
+            class="slide"
+            alt="Slide 6"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="destacados">
+      <h2>¿Qué podemos hacer por vos?</h2>
+      <div class="tarjetas-destacadas">
+        <div class="tarjeta">
+          <i class="fas fa-mobile-alt"></i>
+          <h3>Reparaciones</h3>
+          <p>
+            Reparamos tu equipo en 24 o 48hs con los mejores repuestos del
+            mercado.
+          </p>
+        </div>
+        <div class="tarjeta">
+          <i class="fas fa-shield-alt"></i>
+          <h3>Protección</h3>
+          <p>
+            Disponemos de los mejores accesorios para proteger tus equipos
+            tecnológicos.
+          </p>
+        </div>
+        <div class="tarjeta">
+          <i class="fas fa-laptop-code"></i>
+          <h3>Asesoramiento</h3>
+          <p>
+            Te ayudamos a tomar la mejor decisión en base a tus necesidades.
+          </p>
+        </div>
+        <div class="tarjeta">
+          <i class="fa-solid fa-print"></i>
+          <h3>Configuración</h3>
+          <p>
+            Proporcionamos la mejor calidad para la configuración de tu negocio.
+          </p>
+        </div>
+        <div class="tarjeta">
+          <i class="fas fa-thumbs-up"></i>
+          <h3>Confianza</h3>
+          <p>
+            Brindamos lo mejor en cada reparación para la fidelidad de nuestros
+            clientes.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="testimonios">
+      <h2>Lo que dicen nuestros clientes</h2>
+      <div class="carrusel-testimonios">
+        <div class="testimonios-slide activo">
+          <div class="testimonio">
+            <p class="comentario">
+              Mi pantalla estaba completamente rota y en menos de una hora la
+              dejaron como nueva.
+            </p>
+            <p class="cliente">— Carlos, Pilar.</p>
+          </div>
+          <div class="testimonio">
+            <p class="comentario">
+              Tenía mi PC funcionando lento, actualizaron el sistema y ahora
+              corre como el primer día.
+            </p>
+            <p class="cliente">— Javier, José C. Paz</p>
+          </div>
+        </div>
+        <div class="testimonios-slide">
+          <div class="testimonio">
+            <p class="comentario">
+              La velocidad con la que repararon la fuente de mi PS4 quemada, fue
+              increíble.
+            </p>
+            <p class="cliente">— Fernanda, San Miguel</p>
+          </div>
+          <div class="testimonio">
+            <p class="comentario">
+              Había olvidado mi contraseña de Windows, y en menos de 24 hs ya
+              estaba solucionado.
+            </p>
+            <p class="cliente">— María, Moreno</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {% include 'footer.html' %}
+    <a
+      href="https://wa.me/541128486731?text=Hola%20Tecno%20CF%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n"
+      target="_blank"
+      class="whatsapp-float"
+    >
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+        alt="WhatsApp"
+      />
+    </a>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

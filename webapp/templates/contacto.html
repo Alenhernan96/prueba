@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Contactá a Tecno CF en San Miguel. Hacenos tu consulta por WhatsApp, email o desde el formulario web."
+    />
+    <meta
+      name="keywords"
+      content="contacto Tecno CF, soporte técnico, reparación, San Miguel, WhatsApp, email"
+    />
+    <link rel="canonical" href="https://tecnocf.com.ar/contacto.html" />
+
+    <title>Tecno CF - Contacto</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/estilo.css') }}"
+    />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <h1 class="sr-only">Contactanos - Tecno CF</h1>
+
+    <div id="loader-wrapper">
+      <img
+        src="{{ url_for('static', filename='img/logo.png') }}"
+        id="logo-loader"
+        alt="Tecno CF"
+      />
+    </div>
+
+    {% include 'header.html' %}
+
+    <section id="contacto">
+      <h2>Contacto</h2>
+      <div class="contacto-container">
+        <form class="contacto-form" id="formulario-contacto">
+          <input
+            type="text"
+            name="nombre"
+            id="nombre"
+            placeholder="Tu nombre"
+            minlength="5"
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Tu correo electrónico"
+            required
+          />
+          <textarea
+            name="mensaje"
+            id="mensaje"
+            rows="5"
+            placeholder="Tu mensaje..."
+            minlength="15"
+            required
+          ></textarea>
+          <button type="submit">Enviar mensaje</button>
+        </form>
+
+        <div id="spinner" style="display: none; margin-top: 15px">
+          <i
+            class="fas fa-spinner fa-spin"
+            style="font-size: 24px; color: #00ffc3"
+          ></i>
+          <p style="margin-top: 5px">Enviando mensaje...</p>
+        </div>
+
+        <div class="info-contacto">
+          <p>
+            <a
+              href="https://wa.me/5491128486731"
+              target="_blank"
+              style="color: inherit; text-decoration: none"
+            >
+              <i class="fab fa-whatsapp"></i> 11 5525 8682
+            </a>
+          </p>
+          <p>
+            <a
+              href="mailto:info.tecnocf@gmail.com"
+              style="color: inherit; text-decoration: none"
+            >
+              <i class="fas fa-envelope"></i> info.tecnocf@gmail.com
+            </a>
+          </p>
+          <p><i class="fas fa-map-marker-alt"></i>San Miguel, Buenos Aires</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="ubicacion">
+      <h2><i class="fa-solid fa-map-location-dot"></i> Nos encontramos en</h2>
+      <div class="ubicacion-container">
+        <div class="mapa">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3286.4738873488836!2d-58.74766192446114!3d-34.54155507297666!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bc97e762845d57%3A0xe7740dd0c09cf6a9!2sInt.%20Arricau%202965%2C%20B1663%20Jos%C3%A9%20C.%20Paz%2C%20Provincia%20de%20Buenos%20Aires!5e0!3m2!1ses!2sar!4v1750361817003!5m2!1ses!2sar"
+            width="100%"
+            height="300"
+            style="border: 0; border-radius: 12px"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+        <div class="horarios-ubicacion">
+          <div class="horarios-card">
+            <h3><i class="fa-solid fa-clock"></i> Horarios de atención</h3>
+            <p>
+              <i class="fa-solid fa-calendar-week"></i>
+              <strong>Lunes a Viernes:</strong> 09:00 a 20:00hs.
+            </p>
+            <p>
+              <i class="fa-solid fa-calendar-day"></i>
+              <strong>Sábados:</strong> 10:00 - 18:00hs.
+            </p>
+            <p>
+              <i class="fa-solid fa-ban"></i> <strong>Domingos:</strong> Cerrado
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {% include 'footer.html' %}
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

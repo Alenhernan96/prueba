@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tecno CF - Calculadora IOMA</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/estilo.css') }}"
+    />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/favicon.ico') }}"
+      type="image/x-icon"
+    />
+  </head>
+  <body>
+    {% include 'header.html' %}
+
+    <div class="ioma-container">
+      <h2>🩺 Calculadora IOMA Cronicidad</h2>
+      <div class="ayuda-centro">
+        <button class="boton-flotante-mini" onclick="abrirModalAyudaIOMA()">
+          ℹ️ ¿Cómo funciona la calculadora?
+        </button>
+      </div>
+
+      <label for="dia">Día</label>
+      <input type="text" id="dia" placeholder="Ej: 01" />
+
+      <label for="mes">Mes</label>
+      <input type="text" id="mes" placeholder="Ej: 06" />
+
+      <label for="anio">Año</label>
+      <input type="text" id="anio" placeholder="Ej: 2025" />
+
+      <div class="mb-3">
+        <label for="fecha_completa">📅 O usá el calendario:</label>
+        <input
+          type="date"
+          id="fecha_completa"
+          class="form-control calendario-ioma"
+          onchange="rellenarFechaDesdeCalendario()"
+        />
+      </div>
+      <button onclick="calcularCupon()">Calcular Cupón</button>
+
+      <div id="resultado" class="ioma-resultado mt-3"></div>
+    </div>
+
+    <div id="modalAyudaIOMA" class="modal-ayuda">
+      <div class="modal-ayuda-contenido">
+        <span class="modal-ayuda-cerrar" onclick="cerrarModalAyudaIOMA()"
+          >&times;</span
+        >
+        <h3>¿Cómo usar la Calculadora IOMA?</h3>
+        <p>
+          📆 Ingresá la <strong>fecha de emisión</strong> de la receta (día, mes
+          y año).
+        </p>
+        <p>
+          🧾 El sistema calculará automáticamente la validez del cupón según la
+          normativa.
+        </p>
+        <p>
+          📌 Si la receta está marcada como crónica, tendrá una vigencia de
+          <strong>90 días</strong>.
+        </p>
+        <p>⚠️ Recordá verificar si requiere validación, diagnóstico o sello.</p>
+      </div>
+    </div>
+
+    {% include 'footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

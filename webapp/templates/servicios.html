@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Conocé todos los servicios que ofrecemos: reparación de celulares, tablets, consolas, notebooks y más en San Miguel."
+    />
+    <meta
+      name="keywords"
+      content="servicio técnico, reparación celulares, tablets, consolas, Tecno CF, San Miguel"
+    />
+    <link rel="canonical" href="https://tecnocf.com.ar/servicios.html" />
+
+    <title>Tecno CF - Servicios</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/estilo.css') }}"
+    />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    {% include 'header.html' %}
+    <section id="servicios">
+      <h2>Nuestros Servicios</h2>
+
+      <div class="categoria-servicio">
+        <div class="slider-servicio tarjeta-estilo" id="slider-consolas">
+          <i class="fas fa-gamepad"></i>
+          <h3 id="titulo-consola">Consolas</h3>
+          <p id="descripcion-consola">
+            Limpieza y mantenimiento / Cambio de fuente
+          </p>
+        </div>
+      </div>
+
+      <div class="categoria-servicio">
+        <div class="slider-servicio tarjeta-estilo" id="slider-celulares">
+          <i class="fas fa-mobile-alt"></i>
+          <h3 id="titulo-celular">Celulares</h3>
+          <p id="descripcion-celular">
+            Cambio de módulo / Cambio de pin de carga
+          </p>
+        </div>
+      </div>
+
+      <div class="categoria-servicio">
+        <div class="slider-servicio tarjeta-estilo" id="slider-pc">
+          <i class="fa-solid fa-computer"></i>
+          <h3 id="titulo-pc">PC / Notebooks</h3>
+          <p id="descripcion-pc">
+            Actualización de hardware / Actualización de software
+          </p>
+        </div>
+      </div>
+
+      <div class="desktop-only">
+        <div class="servicio-categoria">
+          <div class="tarjeta-estilo">
+            <i class="fas fa-gamepad"></i>
+            <h3>Consolas</h3>
+            <p>Limpieza y mantenimiento / Cambio de fuente</p>
+          </div>
+          <div class="tarjeta-estilo">
+            <i class="fas fa-gamepad"></i>
+            <h3>Consolas</h3>
+            <p>Cambio de placa / Cambio de pasta térmica</p>
+          </div>
+          <div class="tarjeta-estilo">
+            <i class="fas fa-gamepad"></i>
+            <h3>Consolas</h3>
+            <p>Cambio de disco duro / Reparación de Joystick</p>
+          </div>
+        </div>
+
+        <div class="servicio-categoria">
+          <div class="tarjeta-estilo">
+            <i class="fas fa-mobile-alt"></i>
+            <h3>Celulares</h3>
+            <p>Cambio de módulo / Cambio de pin de carga</p>
+          </div>
+          <div class="tarjeta-estilo">
+            <i class="fas fa-mobile-alt"></i>
+            <h3>Celulares</h3>
+            <p>Cambio de batería / Actualización de software</p>
+          </div>
+          <div class="tarjeta-estilo">
+            <i class="fas fa-mobile-alt"></i>
+            <h3>Celulares</h3>
+            <p>Problemas con la cámara / Problemas de audio</p>
+          </div>
+        </div>
+
+        <div class="servicio-categoria">
+          <div class="tarjeta-estilo">
+            <i class="fa-solid fa-computer"></i>
+            <h3>PC / Notebooks</h3>
+            <p>Actualización de hardware / Actualización de software</p>
+          </div>
+          <div class="tarjeta-estilo">
+            <i class="fa-solid fa-computer"></i>
+            <h3>PC / Notebooks</h3>
+            <p>Reparación de equipos / Formateo de equipos</p>
+          </div>
+          <div class="tarjeta-estilo">
+            <i class="fa-solid fa-computer"></i>
+            <h3>PC / Notebooks</h3>
+            <p>Mantenimiento y seguridad / Recuperación de datos</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="marcas">
+      <h2>Trabajamos con las siguientes marcas</h2>
+      <div class="logos-marcas">
+        {% for marca in [ "samsung.png", "apple.jpg", "motorola.png", "tcl.png",
+        "xiaomi.png", "lg.png", "huawei.png", "alcatel.jpg", "dell.png",
+        "hp.png", "lenovo.png", "asus.png", "msi.png", "nvidia.png", "sony.png",
+        "microsoft.png", "nintendo.png", "xbox.png", "hyperx.png",
+        "logitech.png", "steam.png" ] %}
+        <img
+          src="{{ url_for('static', filename='img/' + marca) }}"
+          class="logo-escondido"
+          alt="{{ marca.split('.')[0] | capitalize }}"
+          title="{{ marca.split('.')[0] | capitalize }}"
+        />
+        {% endfor %}
+      </div>
+    </section>
+
+    {% include 'footer.html' %}
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

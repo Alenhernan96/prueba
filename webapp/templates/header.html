@@ -1,0 +1,40 @@
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  crossorigin="anonymous"
+/>
+
+<header>
+  <a href="{{ url_for('index') }}" class="logo">
+    <img
+      src="{{ url_for('static', filename='img/logo.jpg') }}"
+      alt="Tecno CF"
+    />
+  </a>
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <div class="menu-container" id="menuContainer">
+    <nav>
+      <a href="{{ url_for('index') }}">Inicio</a>
+      <a href="{{ url_for('servicios') }}">Servicios</a>
+      <a href="{{ url_for('contacto') }}">Contacto</a>
+      <a href="{{ url_for('faq') }}">FAQ's</a>
+      <a href="{{ url_for('reseñas') }}">Reseñas</a>
+      <a href="{{ url_for('herramientas') }}">Herramientas</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const toggle = document.getElementById("menuToggle");
+    const container = document.getElementById("menuContainer");
+
+    toggle.addEventListener("click", () => {
+      container.classList.toggle("active");
+    });
+  });
+</script>

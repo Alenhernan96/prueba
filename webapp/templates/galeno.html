@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Galeno – Tecno CF</title>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/estilo.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    {% include 'header.html' %}
+
+    <div class="ioma-container">
+      <h2 class="text-center mb-4">💉 Procesar Archivo de GALENO</h2>
+      <div class="text-center mb-4">
+        <button
+          type="button"
+          class="btn-herramienta"
+          onclick="abrirModalInfoGaleno()"
+          style="max-width: 400px"
+        >
+          ℹ️ ¿Qué hace este programa?
+        </button>
+      </div>
+      <div id="modalInfoGaleno" class="modal-ayuda">
+        <div class="modal-ayuda-contenido">
+          <span class="modal-ayuda-cerrar" onclick="cerrarModalInfoGaleno()"
+            >&times;</span
+          >
+          <h3>📘 ¿Qué hace este programa?</h3>
+          <ul>
+            <li>▪️ Lee y organiza la información del archivo Excel.</li>
+            <li>▪️ Verifica los datos según las reglas del sistema.</li>
+            <li>
+              ▪️ Genera un <strong>archivo comprimido (.ZIP)</strong> listo para
+              usar.
+            </li>
+          </ul>
+          <p>
+            🧠 Ideal para automatizar tareas repetitivas y mantener todo
+            organizado.
+          </p>
+        </div>
+      </div>
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}
+      <div class="mb-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+
+      <form
+        action="/procesar"
+        method="POST"
+        enctype="multipart/form-data"
+        class="text-center"
+      >
+        <div class="mb-3">
+          <input
+            type="file"
+            name="archivo"
+            accept=".xlsx"
+            class="form-control"
+            required
+            style="max-width: 400px; margin: 0 auto"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="btn-herramienta w-100"
+          style="max-width: 400px; margin: 0 auto"
+        >
+          🚀 Procesar archivo
+        </button>
+      </form>
+
+      {% if archivo_zip %}
+      <div class="alert alert-info mt-4 text-center" role="alert">
+        ✅ El archivo fue procesado correctamente.<br />
+        ⬇️ Guardalo en la carpeta <strong>“Galeno”</strong> en tu escritorio.
+      </div>
+
+      {% set descarga_url = url_for('descargar_galeno',
+      filename=archivo_zip.replace('descargas/', '')) %}
+
+      <div class="text-center mt-3">
+        <button
+          onclick="descargarYReiniciar('{{ descarga_url }}')"
+          class="btn-herramienta"
+          style="max-width: 400px"
+        >
+          📦 Descargar ZIP
+        </button>
+      </div>
+      {% endif %}
+    </div>
+
+    {% include 'footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

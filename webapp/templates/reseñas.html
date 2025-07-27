@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Leé lo que opinan nuestros clientes. Valoraciones reales sobre nuestro servicio técnico en San Miguel."
+    />
+    <meta
+      name="keywords"
+      content="reseñas, opiniones, Tecno CF, clientes, testimonios, reparaciones, San Miguel"
+    />
+    <link rel="canonical" href="https://tecnocf.com.ar/reseñas.html" />
+    <title>Tecno CF - Reseñas</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/estilo.css') }}"
+    />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+
+  <body>
+    <h1 class="sr-only">Opiniones de Clientes sobre Tecno CF</h1>
+
+    <div id="loader-wrapper">
+      <img
+        src="{{ url_for('static', filename='img/logo.png') }}"
+        id="logo-loader"
+        alt="Tecno CF"
+      />
+    </div>
+
+    {% include 'header.html' %}
+
+    <section class="carrusel-reseñas">
+      <h2>Lo que opinan nuestros clientes</h2>
+      <div class="reseñas-slider-container">
+        <div class="reseña-slide active">
+          <img
+            src="{{ url_for('static', filename='img/review1.png') }}"
+            alt="Reseña Google"
+          />
+          <strong>— Maria F.</strong><br />
+          <p>
+            Recuperación de pin de Windows mediante booteo con USB sin formatear
+            ni pérdida de archivos.
+          </p>
+        </div>
+        <div class="reseña-slide">
+          <img
+            src="{{ url_for('static', filename='img/review2.png') }}"
+            alt="Reseña Instagram"
+          />
+          <strong>— Fernanda M.</strong><br />
+          <p>
+            Reparación de Resistencias y Diodos: TL431 - 2 Controladores 12V -
+            Optoacoplador, quemados por un cortocircuito.
+          </p>
+        </div>
+
+        <button class="reseña-prev">&#10094;</button>
+        <button class="reseña-next">&#10095;</button>
+      </div>
+
+      <div class="reseñas-dots">
+        <span class="reseña-dot active" data-index="0"></span>
+        <span class="reseña-dot" data-index="1"></span>
+      </div>
+    </section>
+
+    {% include 'footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

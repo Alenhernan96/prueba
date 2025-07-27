@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Herramientas – Tecno CF</title>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/estilo.css') }}"
+    />
+  </head>
+  <body>
+    {% include 'header.html' %}
+
+    <section class="intro-herramientas">
+      <h2>¿Qué es Tecno CF Herramientas?</h2>
+      <p>
+        Esta sección reúne herramientas digitales creadas para resolver tareas
+        repetitivas y mejorar la eficiencia operativa en distintos entornos de
+        trabajo. En esta primera etapa, han sido diseñadas pensando
+        especialmente en el ámbito farmacéutico.
+      </p>
+      <p>
+        Cada utilidad nace de experiencias reales y busca
+        <strong>ahorrar tiempo</strong>, <strong>reducir errores</strong> y
+        <strong>automatizar procesos</strong> de manera simple, rápida y
+        accesible.
+      </p>
+      <p>
+        Actualmente, estamos trabajando en un proyecto más amplio que va a
+        transformar completamente la forma de operar en muchos mostradores. 🚀
+      </p>
+      <p>
+        ¿Tenés una idea que podría facilitar el día a día? ¡Contanos desde el
+        botón de WhatsApp que ves abajo a la derecha! 📲
+      </p>
+    </section>
+
+    <section class="menu-principal">
+      <h1>🔧 Herramientas Tecno CF</h1>
+      <div class="menu-herramientas">
+        <a href="/ioma" class="btn-herramienta">🩺 Calculadora IOMA</a>
+        <a href="/requisitos" class="btn-herramienta"
+          >📄 Requisitos Obras Sociales</a
+        >
+        <a href="/galeno" class="btn-herramienta"
+          >💊 Procesador Galeno Crónicos</a
+        >
+      </div>
+    </section>
+
+    {% include 'footer.html' %}
+  </body>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</html>

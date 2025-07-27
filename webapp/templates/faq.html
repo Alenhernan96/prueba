@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="canonical" href="https://tecnocf.com.ar/faq.html" />
+
+    <meta
+      name="description"
+      content="¿Tenés dudas sobre nuestros servicios técnicos? Encontrá respuestas rápidas sobre reparaciones, garantías, formas de pago y más en Tecno CF, San Miguel."
+    />
+    <meta
+      name="keywords"
+      content="reparación celulares, soporte técnico, preguntas frecuentes, garantías, Tecno CF, San Miguel, servicio técnico"
+    />
+    <title>Tecno CF - FAQ's</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/estilo.css') }}"
+    />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <h1 class="sr-only">Preguntas Frecuentes - Tecno CF</h1>
+
+    <div id="loader-wrapper">
+      <img
+        src="{{ url_for('static', filename='img/logo.png') }}"
+        id="logo-loader"
+        alt="Tecno CF"
+      />
+    </div>
+
+    {% include 'header.html' %}
+
+    <section id="faq">
+      <h2>FAQ's</h2>
+      <div class="faq-container">
+        <div class="faq-item">
+          <button class="faq-question">
+            ¿Cuánto tarda una reparación típica?
+          </button>
+          <div class="faq-answer">
+            <p>
+              Depende del equipo, pero la mayoría de reparaciones se entregan en
+              24 a 72 horas.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">¿Ofrecen garantía?</button>
+          <div class="faq-answer">
+            <p>
+              Sí, todas nuestras reparaciones tienen garantía de 30 días por
+              fallas técnicas.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            ¿Debo llevar cargador o accesorios?
+          </button>
+          <div class="faq-answer">
+            <p>
+              No es necesario, salvo que el problema esté relacionado con el
+              cargador o conectores.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            ¿Qué tipos de dispositivos reparan?
+          </button>
+          <div class="faq-answer">
+            <p>
+              Reparamos celulares, tablets, notebooks, consolas y más. Consultá
+              por tu equipo.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            ¿Qué pasa si no pueden reparar mi equipo?
+          </button>
+          <div class="faq-answer">
+            <p>
+              Si no tiene solución, no cobramos diagnóstico, salvo en casos
+              especiales previamente avisados.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">¿Qué métodos de pago aceptan?</button>
+          <div class="faq-answer">
+            <p>
+              Aceptamos efectivo, transferencia, tarjetas de débito y crédito.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            ¿Las reparaciones tienen costo de diagnóstico?
+          </button>
+          <div class="faq-answer">
+            <p>
+              No, el diagnóstico es sin cargo si realizás la reparación con
+              nosotros.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">¿Puedo pedir retiro a domicilio?</button>
+          <div class="faq-answer">
+            <p>En zonas cercanas, ofrecemos servicio de retiro y entrega.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">¿Mis datos están seguros?</button>
+          <div class="faq-answer">
+            <p>
+              Sí. Garantizamos confidencialidad y nunca accedemos a tu
+              información personal sin tu autorización.
+            </p>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px">
+          <a
+            href="{{ url_for('contacto') }}"
+            class="btn"
+            style="
+              padding: 12px 25px;
+              background-color: #00ffc3;
+              color: #000;
+              font-weight: bold;
+              border-radius: 8px;
+              text-decoration: none;
+            "
+          >
+            ¿Tenés otra duda? Contactanos
+          </a>
+        </div>
+      </div>
+    </section>
+
+    {% include 'footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>
