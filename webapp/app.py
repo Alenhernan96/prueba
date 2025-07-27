@@ -152,11 +152,17 @@ def api_requisitos():
 @app.route('/api/lista-obras')
 def lista_obras():
     try:
-        df = pd.read_excel("data/NORMATIVAS OBRAS SOCIALES v1.01.xlsx", sheet_name="OBRAS SOCIALES")
+        # Ruta absoluta segura al archivo Excel
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        excel_path = os.path.join(base_dir, 'data', 'NORMATIVAS OBRAS SOCIALES v1.01.xlsx')
+
+        df = pd.read_excel(excel_path, sheet_name="OBRAS SOCIALES")
         nombre_columna = [col for col in df.columns if "OBRA SOCIAL" in col.upper()][0]
         nombres = df[nombre_columna].dropna().unique().tolist()
         nombres_ordenados = sorted(nombres, key=lambda x: str(x).upper())
+
         return jsonify(nombres_ordenados)
+
     except Exception as e:
         return jsonify({"error": f"Error al obtener obras sociales: {str(e)}"}), 500
 
