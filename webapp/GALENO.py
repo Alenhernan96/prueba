@@ -15,11 +15,11 @@ def ajustar_columnas(path_archivo):
         ws.column_dimensions[columna_letra].width = max_length + 2
     wb.save(path_archivo)
 
-def procesar_galeno(ruta_excel, carpeta_salida_base):
+def procesar_galeno(ruta_excel):
     nombre_archivo = os.path.basename(ruta_excel)
     match = re.search(r"(\d{2}-\d{2}-\d{4})", nombre_archivo)
     carpeta_base = f"Resultados {match.group(1)}" if match else "Resultados"
-    carpeta_base_path = os.path.join(carpeta_salida_base, carpeta_base)
+    carpeta_base_path = os.path.join("/tmp", carpeta_base)
     carpeta_bajas_path = os.path.join(carpeta_base_path, "Bajas")
     os.makedirs(carpeta_base_path, exist_ok=True)
     os.makedirs(carpeta_bajas_path, exist_ok=True)
@@ -27,7 +27,6 @@ def procesar_galeno(ruta_excel, carpeta_salida_base):
     columnas = ['AFILIADO', 'MONODROGA', 'DOSIS DIARIA', 'INICIO', 'FIN', 'DENOMINACION COMERCIAL', 'AUTORIZACION']
     df = pd.read_excel(ruta_excel)
 
-    # Separar bajas y activos
     df_bajas = df[df['INICIO'].astype(str).str.lower().str.contains("baja", na=False)]
     df_activos = df[~df['INICIO'].astype(str).str.lower().str.contains("baja", na=False)].copy()
 

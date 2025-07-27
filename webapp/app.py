@@ -211,38 +211,35 @@ def procesar():
             return redirect('/galeno')
 
         nombre_archivo = secure_filename(archivo.filename)
-        ruta_input = os.path.join("temp", nombre_archivo)
-        os.makedirs("temp", exist_ok=True)
+        ruta_input = os.path.join("/tmp", nombre_archivo)
         archivo.save(ruta_input)
 
         from GALENO import procesar_galeno
-        ruta_salida = "salidas_galeno"
-        os.makedirs(ruta_salida, exist_ok=True)
-        procesar_galeno(ruta_input, ruta_salida)
+        carpeta_resultados = procesar_galeno(ruta_input)
 
-        # Extraer fecha para el nombre del ZIP
+        # Extraer fecha para nombrar el ZIP
         match = re.search(r"(\d{2}-\d{2}-\d{4})", nombre_archivo)
         fecha = match.group(1) if match else datetime.now().strftime("%Y-%m-%d")
         zip_filename = f"{fecha}.zip"
-        zip_path = os.path.join("static", "descargas", zip_filename)
-        os.makedirs(os.path.dirname(zip_path), exist_ok=True)
+        zip_temp_path = os.path.join("/tmp", zip_filename)
 
-        # Comprimir archivos
-        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for carpeta_raiz, _, archivos in os.walk(ruta_salida):
-                for archivo in archivos:
-                    ruta_completa = os.path.join(carpeta_raiz, archivo)
-                    arcname = os.path.relpath(ruta_completa, ruta_salida)
-                    zipf.write(ruta_completa, arcname)
+        # Comprimir resultados
+        with zipfile.ZipFile(zip_temp_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for root, _, files in os.walk(carpeta_resultados):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arcname = os.path.relpath(file_path, carpeta_resultados)
+                    zipf.write(file_path, arcname)
 
-        # Eliminar temporales
-        shutil.rmtree("temp")
-        shutil.rmtree("salidas_galeno")
+        # Mover el ZIP a la carpeta pública
+        zip_final_path = os.path.join("static", "descargas", zip_filename)
+        os.makedirs(os.path.dirname(zip_final_path), exist_ok=True)
+        shutil.copy(zip_temp_path, zip_final_path)
 
         return render_template("galeno.html", archivo_zip=f"descargas/{zip_filename}")
 
     except Exception as e:
-        print("[ERROR]", e)
+        print("[ERROR AL PROCESAR GALENO]", e)
         flash("❌ Error procesando el archivo. Verificá que sea el formato correcto.", "danger")
         return redirect('/galeno')
 
