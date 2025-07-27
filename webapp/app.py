@@ -247,7 +247,19 @@ def procesar():
 
 @app.route('/descargas/<path:filename>')
 def descargar_galeno(filename):
-    return send_from_directory('static/descargas', filename, as_attachment=True)
+    carpeta_descargas = os.path.join('static', 'descargas')
+
+    # Asegurarse de que la carpeta exista
+    if not os.path.exists(carpeta_descargas):
+        os.makedirs(carpeta_descargas)
+
+    # Verificar si el archivo realmente existe antes de enviarlo
+    ruta_archivo = os.path.join(carpeta_descargas, filename)
+    if not os.path.isfile(ruta_archivo):
+        return "❌ Archivo no disponible para descarga", 404
+
+    # Enviar el archivo como descarga
+    return send_from_directory(carpeta_descargas, filename, as_attachment=True)
 
 # ========== EJECUCIÓN ==========
 
