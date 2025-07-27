@@ -127,7 +127,11 @@ def api_requisitos():
     obra = normalizar(data.get("obra", ""))
 
     try:
-        df = pd.read_excel("data/NORMATIVAS OBRAS SOCIALES v1.01.xlsx", sheet_name="OBRAS SOCIALES")
+        # Ruta robusta al archivo dentro de webapp/data
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        excel_path = os.path.join(base_dir, 'data', 'NORMATIVAS OBRAS SOCIALES v1.01.xlsx')
+
+        df = pd.read_excel(excel_path, sheet_name="OBRAS SOCIALES")
         nombre_columna = [col for col in df.columns if "OBRA SOCIAL" in col.upper()][0]
         df['obra_normalizada'] = df[nombre_columna].apply(normalizar)
         filtro = df[df['obra_normalizada'] == obra]
