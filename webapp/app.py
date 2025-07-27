@@ -214,7 +214,7 @@ def procesar():
         ruta_input = os.path.join("/tmp", nombre_archivo)
         archivo.save(ruta_input)
 
-        from GALENO import procesar_galeno
+        from galeno import procesar_galeno
         carpeta_resultados = procesar_galeno(ruta_input)
 
         # Extraer fecha para nombrar el ZIP
