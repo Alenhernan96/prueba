@@ -95,12 +95,12 @@
         ⬇️ Guardalo en la carpeta <strong>“Galeno”</strong> en tu escritorio.
       </div>
 
-      {% set descarga_url = url_for('descargar_galeno',
-      filename=archivo_zip.replace('descargas/', '')) %}
+      {% set descarga_url = url_for('descarga_temporal', filename=archivo_zip)
+      %}
 
       <div class="text-center mt-3">
         <button
-          onclick="descargarYReiniciar('{{ descarga_url }}')"
+          onclick="descargarYReiniciar('{{ descarga_url | safe }}')"
           class="btn-herramienta"
           style="max-width: 400px"
         >

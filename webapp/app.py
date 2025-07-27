@@ -225,7 +225,7 @@ def procesar():
         zip_filename = f"{fecha}.zip"
         zip_temp_path = os.path.join("/tmp", zip_filename)
 
-        # Comprimir resultados
+        # Comprimir resultados en /tmp
         with zipfile.ZipFile(zip_temp_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for root, _, files in os.walk(carpeta_resultados):
                 for file in files:
@@ -233,17 +233,19 @@ def procesar():
                     arcname = os.path.relpath(file_path, carpeta_resultados)
                     zipf.write(file_path, arcname)
 
-        # Mover el ZIP a la carpeta pública
-        zip_final_path = os.path.join("static", "descargas", zip_filename)
-        os.makedirs(os.path.dirname(zip_final_path), exist_ok=True)
-        shutil.copy(zip_temp_path, zip_final_path)
-
-        return render_template("galeno.html", archivo_zip=f"descargas/{zip_filename}")
+        return render_template("galeno.html", archivo_zip=zip_filename)
 
     except Exception as e:
         print("[ERROR AL PROCESAR GALENO]", e)
         flash("❌ Error procesando el archivo. Verificá que sea el formato correcto.", "danger")
         return redirect('/galeno')
+
+@app.route('/descarga-temporal/<path:filename>')
+def descarga_temporal(filename):
+    ruta = os.path.join('/tmp', filename)
+    if not os.path.isfile(ruta):
+        return "❌ Archivo temporal no encontrado", 404
+    return send_from_directory('/tmp', filename, as_attachment=True)
 
 @app.route('/descargas/<path:filename>')
 def descargar_galeno(filename):
