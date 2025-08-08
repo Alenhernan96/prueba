@@ -4,6 +4,20 @@ body {
   font-family: "Segoe UI", sans-serif;
 }
 
+.obra-social-item {
+  background-color: #222;
+  color: #00ffc3;
+  padding: 10px;
+  margin: 6px;
+  border-radius: 8px;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+.obra-social-item:hover {
+  background-color: #333;
+}
+
 .intro-herramientas {
   max-width: 800px;
   margin: 20px auto 0;

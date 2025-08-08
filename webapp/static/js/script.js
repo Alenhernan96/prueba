@@ -24,8 +24,17 @@ document.addEventListener("DOMContentLoaded", async function () {
       todasLasObras.forEach((nombre) => {
         const div = document.createElement("div");
         div.textContent = nombre;
-        // No le pongas clases de Bootstrap, solo usará tu CSS personalizado
+        div.classList.add("obra-social-item"); // Usá tu CSS personalizado
+        div.style.cursor = "pointer";
         listaObras.appendChild(div);
+      });
+
+      // Evento para completar input al hacer clic
+      listaObras.addEventListener("click", (e) => {
+        if (e.target && e.target.classList.contains("obra-social-item")) {
+          obraInput.value = e.target.textContent.trim();
+          obraInput.focus();
+        }
       });
     }
   } catch (err) {
@@ -35,15 +44,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
-  // Cargar lista de obras una vez
-  try {
-    const res = await fetch("/api/lista-obras");
-    todasLasObras = await res.json();
-  } catch (err) {
-    console.error("No se pudo cargar la lista de obras sociales:", err);
-  }
-
-  // Filtrado dinámico al tipear
+  // Autocompletado dinámico al tipear
   if (obraInput && datalist) {
     obraInput.addEventListener("input", () => {
       const valor = obraInput.value.trim().toUpperCase();
