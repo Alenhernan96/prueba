@@ -165,22 +165,57 @@ async function buscarRequisitos() {
         </thead>
         <tbody>`;
 
-    data.requisitos.forEach((item) => {
-      const valor = String(item.valor).toUpperCase().trim();
-      const esAprobado =
-        valor === "SI" ||
-        valor === "T&S" ||
-        valor === "DIRECTO" ||
-        valor.includes("DIGITAL");
-      const icono = esAprobado
-        ? '<span class="requerimientos-check">✅</span>'
-        : '<span class="requerimientos-cross">❌</span>';
+    // Helpers
+    const norm = (s) =>
+      String(s || "")
+        .toUpperCase()
+        .trim();
+    const aprobado = (v) =>
+      v === "SI" || v === "T&S" || v === "DIRECTO" || v.includes("DIGITAL");
 
-      html += `<tr><td>${item.norma}</td><td>${icono} ${valor}</td></tr>`;
+    // Mapeo de normativas -> emoji (usa includes, no exacto)
+    function emojiPorNorma(norma, valor) {
+      const n = norm(norma);
+      const v = norm(valor);
+
+      if (n.includes("DIGITAL")) return "💻"; // Formato/Receta digital
+      if (n.includes("VALIDEZ")) return "📅"; // Días de vigencia
+      if (n.includes("MONTO TOPE") || n.includes("TOPE")) return "💲"; // Límite $
+      if (n.includes("TRATAMIENTO PROLONG")) return "⏳";
+      if (n.includes("CANTIDAD")) return "🔢";
+      if (n.includes("TROQUEL")) return "🏷️";
+      if (n.includes("CORREGIR") || n.includes("ENMIENDA")) return "✏️";
+      if (n.includes("CREDENCIAL") || n.includes("CUIL") || n.includes("DNI"))
+        return "🪪";
+      if (n.includes("RECETARIO") || n.includes("RECETA")) return "📜";
+      if (n.includes("MANDATARIA") || n.includes("ENTIDAD")) return "🏢";
+      if (n.includes("OTROS") || n.includes("OBSERVA")) return "📌";
+
+      // Fallback: semáforo por SI/NO/etc.
+      return aprobado(v) ? "✅" : "❌";
+    }
+
+    data.requisitos.forEach((item) => {
+      const valor = norm(item.valor);
+      const icono = emojiPorNorma(item.norma, valor);
+
+      // Para "monto tope" podés anteponer el símbolo si no viene con $
+      const mostrarValor =
+        icono === "💲" && !/^[$€]/.test(item.valor.trim())
+          ? `$ ${item.valor}`
+          : item.valor;
+
+      html += `
+    <tr>
+      <td>${item.norma}</td>
+      <td><span class="req-ico">${icono}</span> ${mostrarValor
+        .toString()
+        .toUpperCase()
+        .trim()}</td>
+    </tr>`;
     });
 
     html += `</tbody></table></div>`;
-
     resultado.innerHTML = html;
   }
 }
@@ -341,21 +376,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const formData = new FormData(formulario);
 
-      fetch("enviar.php", {
+      fetch(formulario.getAttribute("action") || "/api/contacto", {
         method: "POST",
         body: formData,
       })
-        .then((respuesta) => {
-          if (!respuesta.ok) throw new Error("Error en el envío.");
-          return respuesta.text();
-        })
-        .then(() => {
-          Swal.fire(
-            "¡Gracias!",
-            "Tu mensaje fue enviado correctamente.",
-            "success"
-          );
-          formulario.reset();
+        .then((r) =>
+          r
+            .json()
+            .catch(() => ({}))
+            .then((j) => ({ ok: r.ok, ...j }))
+        )
+        .then(({ ok, error }) => {
+          if (ok) {
+            Swal.fire(
+              "¡Gracias!",
+              "Tu mensaje fue enviado correctamente.",
+              "success"
+            );
+            formulario.reset();
+          } else {
+            Swal.fire(
+              "Error",
+              error || "No se pudo enviar el mensaje.",
+              "error"
+            );
+          }
         })
         .catch(() => {
           Swal.fire(

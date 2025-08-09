@@ -263,6 +263,31 @@ def descargar_galeno(filename):
     # Enviar el archivo como descarga
     return send_from_directory(carpeta_descargas, filename, as_attachment=True)
 
+@app.post("/api/contacto")
+def api_contacto():
+    nombre  = (request.form.get("nombre") or "").strip()
+    email   = (request.form.get("email")  or "").strip()
+    mensaje = (request.form.get("mensaje") or "").strip()
+
+    if not (nombre and email and mensaje):
+        return jsonify(ok=False, error="Completá todos los campos."), 400
+
+    try:
+        msg = EmailMessage()
+        msg["Subject"] = f"Nuevo mensaje de contacto – {nombre}"
+        msg["From"]    = EMAIL_REMITENTE
+        msg["To"]      = EMAIL_RECEPTOR
+        msg.set_content(f"Nombre: {nombre}\nEmail: {email}\n\nMensaje:\n{mensaje}")
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(EMAIL_REMITENTE, EMAIL_PASS)
+            smtp.send_message(msg)
+
+        return jsonify(ok=True)
+    except Exception as e:
+        print("[ERROR CONTACTO]", e)
+        return jsonify(ok=False, error="No se pudo enviar el mensaje."), 500
+
 # ========== EJECUCIÓN ==========
 
 if __name__ == '__main__':

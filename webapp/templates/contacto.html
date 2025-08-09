@@ -52,7 +52,13 @@
     <section id="contacto">
       <h2>Contacto</h2>
       <div class="contacto-container">
-        <form class="contacto-form" id="formulario-contacto">
+        <form
+          class="contacto-form"
+          id="formulario-contacto"
+          action="{{ url_for('api_contacto') }}"
+          method="post"
+          novalidate
+        >
           <input
             type="text"
             name="nombre"
