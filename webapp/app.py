@@ -53,13 +53,13 @@ def herramientas():
 def ioma():
     return render_template("ioma.html")
 
-@app.route('/requisitos')
-def requisitos():
-    return render_template("requerimientos.html")
-
 @app.route('/galeno')
 def galeno():
     return render_template("galeno.html")
+
+@app.route('/requisitos')
+def requisitos():
+    return render_template("requerimientos2.html")
 
 # ========== LÓGICA: CALCULADORA IOMA ==========
 

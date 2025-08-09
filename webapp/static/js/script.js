@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (e.target && e.target.classList.contains("obra-social-item")) {
           obraInput.value = e.target.textContent.trim();
           obraInput.focus();
+          buscarRequisitos();
         }
       });
     }
@@ -626,3 +627,21 @@ function rellenarFechaDesdeCalendario() {
   document.getElementById("mes").value = mes;
   document.getElementById("anio").value = anio;
 }
+
+// Ajustar menú hamburguesa según el tamaño de pantalla
+function ajustarMenuHamburguesa() {
+  const menuContainer = document.getElementById("menuContainer");
+  const menuToggle = document.getElementById("menuToggle");
+
+  if (!menuContainer || !menuToggle) return;
+
+  if (window.innerWidth >= 769) {
+    menuContainer.classList.remove("active");
+    menuToggle.style.display = "none";
+  } else {
+    menuToggle.style.display = "block";
+  }
+}
+
+window.addEventListener("resize", ajustarMenuHamburguesa);
+window.addEventListener("DOMContentLoaded", ajustarMenuHamburguesa);
