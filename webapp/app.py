@@ -25,6 +25,16 @@ EMAIL_REMITENTE = os.getenv("EMAIL_REMITENTE")
 EMAIL_RECEPTOR = os.getenv("EMAIL_RECEPTOR")
 EMAIL_PASS = os.getenv("EMAIL_APP_PASS")
 
+ALLOWED_EXT_TO_MIME = {
+    "pdf":  ("application", "pdf"),
+    "xls":  ("application", "vnd.ms-excel"),
+    "xlsx": ("application", "vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+    "doc":  ("application", "msword"),
+    "docx": ("application", "vnd.openxmlformats-officedocument.wordprocessingml.document"),
+}
+
+MAX_ATTACHMENT_BYTES = 16 * 1024 * 1024  # 16 MB
+
 # ========== RUTAS DE PÁGINAS ==========
 
 @app.route('/')
@@ -178,37 +188,55 @@ def lista_obras():
 
 @app.route('/enviar-sugerencia', methods=['POST'])
 def enviar_sugerencia():
+    tipo = request.form.get("tipo")  # "obra_social" o "prestador"
     nombre = request.form.get("nombre")
     email = request.form.get("email")
     obra = request.form.get("obra")
-    archivo = request.files.get("archivo")
+    archivos = request.files.getlist("archivo")  # 👈 varios archivos
 
-    if not all([nombre, email, obra]):
+    if not all([tipo, nombre, email, obra]):
         flash("Todos los campos obligatorios deben completarse", "danger")
-        return redirect("/requisitos")
+        return redirect(request.referrer or "/")
 
     try:
+        tipo_legible = "Obra Social sugerida" if tipo == "obra_social" else "Prestador sugerido"
+
         msg = EmailMessage()
-        msg['Subject'] = f"Sugerencia nueva - {obra}"
+        msg['Subject'] = f"Sugerencia nueva - {tipo_legible}: {obra}"
         msg['From'] = EMAIL_REMITENTE
         msg['To'] = EMAIL_RECEPTOR
-        msg.set_content(f"Nombre: {nombre}\nEmail: {email}\nObra sugerida: {obra}")
+        msg.set_content(
+            f"Tipo: {tipo_legible}\nNombre: {nombre}\nEmail: {email}\nDetalle: {obra}"
+        )
 
-        if archivo and archivo.filename.endswith(".pdf"):
-            contenido = archivo.read()
-            msg.add_attachment(contenido, maintype='application', subtype='pdf', filename=archivo.filename)
+        for archivo in archivos:
+            if archivo and archivo.filename:
+                filename = secure_filename(archivo.filename)
+                ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+
+                if ext in ALLOWED_EXT_TO_MIME:
+                    contenido = archivo.read()
+                    if len(contenido) > MAX_ATTACHMENT_BYTES:
+                        flash(f"El archivo {filename} es demasiado grande (máx. 16 MB).", "warning")
+                        continue
+                    maintype, subtype = ALLOWED_EXT_TO_MIME[ext]
+                    msg.add_attachment(contenido, maintype=maintype, subtype=subtype, filename=filename)
+                else:
+                    flash(f"Formato no permitido: {filename}", "warning")
 
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
             smtp.login(EMAIL_REMITENTE, EMAIL_PASS)
             smtp.send_message(msg)
 
         flash("✅ Sugerencia enviada con éxito. ¡Gracias por colaborar!", "success")
+
     except Exception as e:
         import traceback
         print("[ERROR DE ENVÍO]")
         traceback.print_exc()
+        flash("❌ Hubo un problema enviando la sugerencia. Probá de nuevo en unos minutos.", "danger")
 
-    return redirect("/requisitos")
+    return redirect(request.referrer or "/")
 
 @app.route('/procesar', methods=['POST'])
 def procesar():

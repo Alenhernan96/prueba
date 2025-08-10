@@ -189,6 +189,22 @@
               class="requerimientos-form"
             >
               <div class="mb-3">
+                <label for="tipo" class="requerimientos-label"
+                  >Tipo de sugerencia:</label
+                >
+                <select
+                  id="tipo"
+                  name="tipo"
+                  class="requerimientos-input"
+                  required
+                >
+                  <option value="">-- Seleccionar --</option>
+                  <option value="obra_social">Obra Social sugerida</option>
+                  <option value="prestador">Prestador sugerido</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
                 <label for="nombre" class="requerimientos-label">Nombre:</label>
                 <input
                   type="text"
@@ -211,9 +227,7 @@
               </div>
 
               <div class="mb-3">
-                <label for="obra" class="requerimientos-label"
-                  >Obra Social sugerida:</label
-                >
+                <label for="obra" class="requerimientos-label">Detalle:</label>
                 <input
                   type="text"
                   id="obra"
@@ -225,14 +239,22 @@
 
               <div class="mb-3">
                 <label for="archivo" class="requerimientos-label"
-                  >Adjuntar PDF (opcional):</label
+                  >Adjuntar archivos (opcional):</label
                 >
                 <input
                   type="file"
                   id="archivo"
                   name="archivo"
-                  accept="application/pdf"
                   class="requerimientos-input"
+                  accept="
+        application/pdf,
+        application/vnd.ms-excel,
+        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+        application/msword,
+        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+        .pdf,.xls,.xlsx,.doc,.docx
+      "
+                  multiple
                 />
               </div>
 
