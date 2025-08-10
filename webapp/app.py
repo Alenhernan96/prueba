@@ -11,6 +11,8 @@ import shutil
 from werkzeug.utils import secure_filename
 import re
 import sys
+from unidecode import unidecode
+import subprocess
 sys.path.append(".")
 
 # Cargar variables del archivo .env
@@ -60,6 +62,10 @@ def galeno():
 @app.route('/requisitos')
 def requisitos():
     return render_template("requerimientos2.html")
+
+@app.route('/prestadores')
+def prestadores_page():
+    return render_template("prestadores.html", obras=list(OBRAS_ARCHIVOS.keys()))
 
 # ========== LÓGICA: CALCULADORA IOMA ==========
 
@@ -287,6 +293,252 @@ def api_contacto():
     except Exception as e:
         print("[ERROR CONTACTO]", e)
         return jsonify(ok=False, error="No se pudo enviar el mensaje."), 500
+
+# ========== BUSCADOR DE PRESTADORES (3 TXT + 1 XLS) ==========
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+
+OBRAS_ARCHIVOS = {
+    "Assistencial Salud": os.path.join(DATA_DIR, "ASSISTENCIAL SALUD - PRESTADORES.txt"),
+    "OSMEDICA":           os.path.join(DATA_DIR, "OSMEDICA -PRESTADORES.txt"),
+    "OSPIT (Tabaco)":     os.path.join(DATA_DIR, "TABACO -PRESTADORES.txt"),
+    "Unión Personal":     os.path.join(DATA_DIR, "UNION PERSONAL - PRESTADORES.xls"),
+}
+
+def _doc_to_text(path_txt):
+    # Acá leemos directamente el .txt ya convertido (UTF-8)
+    with open(path_txt, "r", encoding="utf-8", errors="ignore") as f:
+        return f.read()
+
+def _clean_lines(txt):
+    # Limpieza básica de líneas
+    return [re.sub(r"\s+", " ", l).strip() for l in txt.splitlines() if l and l.strip()]
+
+# ---- Parsers mínimos por obra ----
+def parse_assistencial(path_txt):
+    txt = _doc_to_text(path_txt); lines = _clean_lines(txt)
+    zona = ""; rows = []
+    for l in lines:
+        up = l.upper()
+        if re.fullmatch(r"(CAPITAL(\s+FEDERAL)?|ZONA\s+SUR|ZONA\s+OESTE|ZONA\s+NORTE)", up):
+            zona = up.replace("CAPITAL FEDERAL", "CAPITAL").strip()
+            continue
+        if any(k in up for k in ["CARTILLA DE PRESTADORES","VIGENCIA","ASSISTENCIAL","OBRA SOCIAL"]):
+            continue
+        if len(l) >= 3:
+            rows.append({"prestador": l, "zona": zona})
+    return pd.DataFrame(rows)
+
+def parse_osmedica(path_txt):
+    txt = _doc_to_text(path_txt); lines = _clean_lines(txt)
+    zona = ""; rows = []
+    for l in lines:
+        up = l.upper()
+        if re.fullmatch(r"(PRESTADORES?\s+CABA|CABA|ZONA\s+NORTE|ZONA\s+SUR|ZONA\s+OESTE|ZONA\s+NOROESTE|PRESTADORES?\s+ZONA\s+\w+)", up):
+            zona = re.sub(r"PRESTADORES?\s+","", up).strip()
+            continue
+        if any(k in up for k in ["CARTILLA DE PRESTADORES","VIGENCIA","FEDERACION MEDICA"]):
+            continue
+        m = re.search(r"\b(MN|MP)\s*[\-–:]?\s*(\d{4,6})\b", l, flags=re.I)
+        matricula = m.group(2) if m else ""
+        rows.append({"prestador": l, "zona": zona, "matricula": matricula})
+    return pd.DataFrame(rows)
+
+def parse_tabaco(path_txt):
+    txt = _doc_to_text(path_txt); lines = _clean_lines(txt)
+    tipo = ""; rows = []
+    for l in lines:
+        up = l.upper()
+        if up == "ENTIDADES": tipo = "Entidad"; continue
+        if up == "PROFESIONALES": tipo = "Profesional"; continue
+        if any(k in up for k in ["CARTILLA DE PRESTADORES","VIGENCIA","O.S.P.I.T","OSPIT","OBRA SOCIAL"]):
+            continue
+        if len(l) >= 3:
+            rows.append({"prestador": l, "especialidad": tipo})
+    return pd.DataFrame(rows)
+
+def _norm_col(col):
+    s = unidecode(str(col or ""))
+    s = re.sub(r"\s+", " ", s)      # colapsa espacios (incluye NBSP)
+    s = s.strip().lower()
+    s = re.sub(r"[^\w]+", "", s)    # deja solo [a-z0-9_]
+    return s
+
+def read_union_personal_xls(path_xls):
+    df = pd.read_excel(path_xls)
+
+    # 1) normalizo nombres → k
+    norm_map = {c: _norm_col(c) for c in df.columns}
+
+    # 2) candidatos
+    cand_prest = [c for c,k in norm_map.items() if ("prest" in k or "nombre" in k)]
+    cand_matric = [c for c,k in norm_map.items() if ("matric" in k and "tipo" not in k)]
+    col_tipo_matric = next((c for c,k in norm_map.items() if "tipo" in k and "matric" in k), None)
+
+    # 3) elegir mejor columna de matrícula (la que tenga más dígitos)
+    def score_digits(series):
+        s = series.astype(str).str.findall(r"\d").str.len().fillna(0)
+        return int(s.sum())
+
+    if cand_matric:
+        scores = {c: score_digits(df[c]) for c in cand_matric}
+        col_matric = max(scores, key=scores.get)
+    else:
+        col_matric = None  # no encontrada; la dejaremos vacía
+
+    # 4) construir dataframe con nombres amigables
+    out = pd.DataFrame()
+
+    # prestador
+    if cand_prest:
+        out["prestador"] = df[cand_prest[0]]
+    else:
+        # si no hay, intenta una genérica
+        out["prestador"] = df.iloc[:,0].astype(str)
+
+    # matrícula numérica (si existe)
+    if col_matric:
+        out["matricula"] = df[col_matric]
+    else:
+        out["matricula"] = ""
+
+    # extras comunes
+    # (estos mapeos son best-effort; si no están, quedan vacíos)
+    def pick_one(substrs):
+        for c,k in norm_map.items():
+            if any(s in k for s in substrs):
+                return c
+        return None
+
+    col_espec = pick_one(["espec"])
+    col_dir   = pick_one(["direc","domic"])
+    col_loc   = pick_one(["local","ciud","partido"])
+    col_zona  = pick_one(["zona","regi"])
+    col_obs   = pick_one(["observ","nota"])
+
+    out["especialidad"]  = df[col_espec] if col_espec else ""
+    out["direccion"]     = df[col_dir]   if col_dir   else ""
+    out["localidad"]     = df[col_loc]   if col_loc   else ""
+    out["zona"]          = df[col_zona]  if col_zona  else ""
+    out["observaciones"] = df[col_obs]   if col_obs   else ""
+
+    # opcional: conservar el "tipo matricula" por si lo querés mostrar luego
+    if col_tipo_matric:
+        out["observaciones"] = out["observaciones"].astype(str) + \
+            out["observaciones"].mask(out["observaciones"].astype(str).str.strip()=="", "") \
+            .astype(str).radd("")  # no duplica, pero lo podés unir distinto
+        # o guardar en otra columna si querés:
+        # out["tipo_matricula"] = df[col_tipo_matric]
+
+    # limpiar filas totalmente vacías
+    out = out.dropna(how="all")
+
+    return out
+
+def _norm_text(x): 
+    from unidecode import unidecode
+    return unidecode(str(x or "")).upper()
+
+def _first_series(df, col):
+    """Devuelve una Series para 'col'. Si hay varias columnas con ese nombre, usa la primera."""
+    obj = df[col]
+    if isinstance(obj, pd.DataFrame):
+        # tomá la 1ra columna; si querés, podés combinar, pero con la 1ra alcanza
+        return obj.iloc[:, 0]
+    return obj
+
+def _to_index(df, obra):
+    # columnas estándar
+    cols = ["prestador","matricula","especialidad","direccion","localidad","zona","observaciones"]
+    for c in cols:
+        if c not in df.columns:
+            df[c] = ""
+
+    # Si hay duplicadas, uso la primera
+    def _first_series(obj):
+        return obj.iloc[:,0] if isinstance(obj, pd.DataFrame) else obj
+
+    base = pd.DataFrame({c: _first_series(df[c]) for c in cols}).fillna("")
+
+    base["obra_social"] = obra
+
+    from unidecode import unidecode
+    def norm_text(x): return unidecode(str(x or "")).upper()
+
+    # Blob normalizado para texto
+    base["__blob__"] = (
+        base["prestador"].map(norm_text) + " | " +
+        base["matricula"].map(norm_text) + " | " +
+        base["especialidad"].map(norm_text) + " | " +
+        base["direccion"].map(norm_text) + " | " +
+        base["localidad"].map(norm_text) + " | " +
+        base["zona"].map(norm_text) + " | " +
+        base["observaciones"].map(norm_text)
+    )
+
+    # __mat_num__: matrícula limpia (quita .0 y no dígitos)
+    mat_str = base["matricula"].astype(str).str.replace(r"\.0$", "", regex=True)
+    base["__mat_num__"] = mat_str.str.replace(r"\D", "", regex=True)
+
+    # __nums_all__: TODAS las secuencias de dígitos presentes en el registro (cualquier columna)
+    # 1) concateno todas las columnas originales a texto (sin normalizar)
+    df_txt = df.fillna("").astype(str)
+    concat_all = df_txt.apply(lambda r: " | ".join(r.values), axis=1)
+
+    # 2) extraigo todas las secuencias numéricas y las uno con espacios (ej: "12345 6789")
+    base["__nums_all__"] = concat_all.str.findall(r"\d+").str.join(" ")
+
+    return base
+
+def _load_all():
+    data = {}
+    for obra, path in OBRAS_ARCHIVOS.items():
+        if not os.path.exists(path):
+            print(f"⚠️ No se encontró {path}")
+            continue
+        if obra == "Assistencial Salud":
+            df = parse_assistencial(path)
+        elif obra == "OSMEDICA":
+            df = parse_osmedica(path)
+        elif obra == "OSPIT (Tabaco)":
+            df = parse_tabaco(path)
+        else:  # Unión Personal (.xls)
+            df = read_union_personal_xls(path)
+        data[obra] = _to_index(df, obra)
+    return data
+
+DATA_PRESTADORES = _load_all()
+
+def _tokens(q):
+    return [t for t in _norm_text(q).split() if t]
+
+@app.get('/api/prestadores')
+def api_prestadores():
+    obra = request.args.get("obra","")
+    q = (request.args.get("q") or "").strip()
+    if obra not in DATA_PRESTADORES:
+        return jsonify({"total":0,"items":[]})
+    df = DATA_PRESTADORES[obra]
+
+    qd = re.sub(r"\D","", q)
+    if qd and len(qd) >= 3:  # desde 3 dígitos
+        # Busca en matrícula limpia y en todas las secuencias numéricas del registro
+        mask = df["__mat_num__"].str.contains(qd, na=False) | df["__nums_all__"].str.contains(qd, na=False)
+        res = df[mask]
+        if res.empty:
+            # fallback textual (por si el número está pegado a letras raras)
+            res = df[df["__blob__"].str.contains(re.escape(qd), na=False)]
+    else:
+        toks = [t for t in _norm_text(q).split() if t]
+        mask = pd.Series([True]*len(df))
+        for t in toks:
+            mask &= df["__blob__"].str.contains(re.escape(t), na=False)
+        res = df[mask] if toks else df.iloc[0:0]
+
+    cols_out = ["obra_social","prestador","matricula","especialidad","direccion","localidad","zona","observaciones"]
+    items = res[cols_out].head(500).fillna("").to_dict(orient="records")
+    return jsonify({"total": int(res.shape[0]), "items": items})
 
 # ========== EJECUCIÓN ==========
 

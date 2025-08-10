@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tecno CF - Buscador de Prestadores</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/estilo.css') }}"
+    />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/favicon.ico') }}"
+      type="image/x-icon"
+    />
+
+    <!-- gtag opcional (igual que en tus otras páginas) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-VJDF2QPWBP"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-VJDF2QPWBP");
+    </script>
+  </head>
+  <body>
+    {% include 'header.html' %}
+    <section id="prestadores-root" class="prestadores">
+      <div class="prestadores-card">
+        <div class="prestadores-title">
+          <h1>🏢 Buscador de Prestadores</h1>
+        </div>
+
+        <div class="ayuda-centro">
+          <button
+            id="prestadores-help-open"
+            class="requerimientos-boton"
+            style="max-width: 300px"
+          >
+            ℹ️ ¿Cómo funciona el buscador?
+          </button>
+        </div>
+
+        <div class="prestadores-row">
+          <div class="prestadores-field">
+            <label for="prestadores-obra">Obra Social</label>
+            <select id="prestadores-obra" class="prestadores-input">
+              {% for o in obras %}
+              <option value="{{o}}">{{o}}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="prestadores-field">
+            <label for="prestadores-q">Buscar por prestador o matrícula</label>
+            <input
+              id="prestadores-q"
+              class="prestadores-input"
+              placeholder="Ej.: 'Dra Pérez' o '35369'..."
+            />
+          </div>
+
+          <div class="prestadores-actions">
+            <button id="prestadores-search" class="requerimientos-boton">
+              Buscar
+            </button>
+          </div>
+        </div>
+
+        <p class="prestadores-muted">
+          <span id="prestadores-total" class="prestadores-count"
+            >0 resultados</span
+          >
+        </p>
+
+        <div class="prestadores-table-wrap">
+          <table class="prestadores-table">
+            <thead>
+              <tr>
+                <th>Prestador</th>
+                <th>Matrícula</th>
+              </tr>
+            </thead>
+            <tbody id="prestadores-tbody">
+              <tr>
+                <td class="prestadores-nores" colspan="2">Sin resultados</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal de ayuda -->
+    <div id="prestadores-help" class="modal-ayuda">
+      <div class="modal-ayuda-contenido">
+        <span class="modal-ayuda-cerrar" id="prestadores-help-close"
+          >&times;</span
+        >
+        <h3>¿Cómo usar el Buscador?</h3>
+        <p>1) Elegí una <strong>obra social</strong> del listado.</p>
+        <p>
+          2) Escribí <strong>parte del nombre</strong> o la
+          <strong>matrícula</strong>.
+        </p>
+        <p>
+          3) Si ingresás un número de <b>3+ dígitos</b>, se busca como matrícula
+          en todo el registro.
+        </p>
+        <p>
+          4) La búsqueda ignora acentos y encuentra coincidencias por palabras.
+        </p>
+      </div>
+    </div>
+
+    {% include 'footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

@@ -29,11 +29,22 @@ document.addEventListener("DOMContentLoaded", async function () {
         listaObras.appendChild(div);
       });
 
+      // 🔹 Mostrar contador en el párrafo
+      const p = document.querySelector(".requerimientos-listado p");
+      if (p) {
+        p.innerHTML = `Estas son las obras sociales actualmente disponibles en el sistema: <strong>${todasLasObras.length}</strong> obras sociales.`;
+      }
+
       // Evento para completar input al hacer clic
       listaObras.addEventListener("click", (e) => {
         if (e.target && e.target.classList.contains("obra-social-item")) {
           obraInput.value = e.target.textContent.trim();
-          obraInput.focus();
+
+          // Evitar focus en móviles
+          if (!/Mobi|Android/i.test(navigator.userAgent)) {
+            obraInput.focus();
+          }
+
           buscarRequisitos();
         }
       });
@@ -44,7 +55,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       listaObras.innerHTML = `<div style="color: red;">❌ No se pudo cargar el listado.</div>`;
     }
   }
-
   // Autocompletado dinámico al tipear
   if (obraInput && datalist) {
     obraInput.addEventListener("input", () => {
@@ -156,68 +166,101 @@ async function buscarRequisitos() {
 
   if (!res.ok) {
     resultado.innerHTML = `<div class="text-danger">❌ ${data.error}</div>`;
-  } else {
-    let html = `<h4 class="requerimientos-titulo">📄 Requisitos para <strong>${data.obra}</strong></h4>`;
-    html += `<div class="requerimientos-scroll">
-      <table class="requerimientos-tabla">
-        <thead>
-          <tr><th>Normativa</th><th>Respuesta</th></tr>
-        </thead>
-        <tbody>`;
-
-    // Helpers
-    const norm = (s) =>
-      String(s || "")
-        .toUpperCase()
-        .trim();
-    const aprobado = (v) =>
-      v === "SI" || v === "T&S" || v === "DIRECTO" || v.includes("DIGITAL");
-
-    // Mapeo de normativas -> emoji (usa includes, no exacto)
-    function emojiPorNorma(norma, valor) {
-      const n = norm(norma);
-      const v = norm(valor);
-
-      if (n.includes("DIGITAL")) return "💻"; // Formato/Receta digital
-      if (n.includes("VALIDEZ")) return "📅"; // Días de vigencia
-      if (n.includes("MONTO TOPE") || n.includes("TOPE")) return "💲"; // Límite $
-      if (n.includes("TRATAMIENTO PROLONG")) return "⏳";
-      if (n.includes("CANTIDAD")) return "🔢";
-      if (n.includes("TROQUEL")) return "🏷️";
-      if (n.includes("CORREGIR") || n.includes("ENMIENDA")) return "✏️";
-      if (n.includes("CREDENCIAL") || n.includes("CUIL") || n.includes("DNI"))
-        return "🪪";
-      if (n.includes("RECETARIO") || n.includes("RECETA")) return "📜";
-      if (n.includes("MANDATARIA") || n.includes("ENTIDAD")) return "🏢";
-      if (n.includes("OTROS") || n.includes("OBSERVA")) return "📌";
-
-      // Fallback: semáforo por SI/NO/etc.
-      return aprobado(v) ? "✅" : "❌";
-    }
-
-    data.requisitos.forEach((item) => {
-      const valor = norm(item.valor);
-      const icono = emojiPorNorma(item.norma, valor);
-
-      // Para "monto tope" podés anteponer el símbolo si no viene con $
-      const mostrarValor =
-        icono === "💲" && !/^[$€]/.test(item.valor.trim())
-          ? `$ ${item.valor}`
-          : item.valor;
-
-      html += `
-    <tr>
-      <td>${item.norma}</td>
-      <td><span class="req-ico">${icono}</span> ${mostrarValor
-        .toString()
-        .toUpperCase()
-        .trim()}</td>
-    </tr>`;
-    });
-
-    html += `</tbody></table></div>`;
-    resultado.innerHTML = html;
+    return;
   }
+
+  let html = `<h4 class="requerimientos-titulo">📄 Requisitos para <strong>${data.obra}</strong></h4>`;
+
+  html += `<div class="requerimientos-scroll">
+    <table class="requerimientos-tabla">
+      <thead>
+        <tr><th>Normativa</th><th>Respuesta</th></tr>
+      </thead>
+      <tbody>`;
+
+  // Helpers
+  const norm = (s) =>
+    String(s || "")
+      .toUpperCase()
+      .trim();
+  const aprobado = (v) =>
+    v === "SI" || v === "T&S" || v === "DIRECTO" || v.includes("DIGITAL");
+
+  // Detecta valores "de relleno" o vacíos
+  const esVacioOUseless = (s) => {
+    const t = String(s || "").trim();
+    if (!t) return true;
+    const up = t.toUpperCase();
+    const basura = new Set([
+      "...",
+      "…",
+      "-",
+      "—",
+      "N/A",
+      "S/D",
+      "NO APLICA",
+      "SIN DATOS",
+    ]);
+    return basura.has(up);
+  };
+
+  // Mapeo de normativas -> emoji (usa includes, no exacto)
+  function emojiPorNorma(norma, valor) {
+    const n = norm(norma);
+    const v = norm(valor);
+
+    if (n.includes("DIGITAL")) return "💻"; // Formato/Receta digital
+    if (n.includes("VALIDEZ")) return "📅"; // Días de vigencia
+    if (n.includes("MONTO TOPE") || n.includes("TOPE")) return "💲"; // Límite $
+    if (n.includes("TRATAMIENTO PROLONG")) return "⏳";
+    if (n.includes("CANTIDAD")) return "🔢";
+    if (n.includes("TROQUEL")) return "🏷️";
+    if (n.includes("CORREGIR") || n.includes("ENMIENDA")) return "✏️";
+    if (n.includes("CREDENCIAL") || n.includes("CUIL") || n.includes("DNI"))
+      return "🪪";
+    if (n.includes("RECETARIO") || n.includes("RECETA")) return "📜";
+    if (n.includes("MANDATARIA") || n.includes("ENTIDAD")) return "🏢";
+    if (n.includes("EMPRESA") || n.includes("NOMBRE DE LA EMPRESA"))
+      return "🏢";
+    if (n.includes("OTROS") || n.includes("OBSERVA")) return "📌";
+    return aprobado(v) ? "✅" : "❌"; // Fallback
+  }
+
+  // 🔎 FILTRO: solo filas con contenido real en norma y valor
+  const filasUtiles = (data.requisitos || []).filter((item) => {
+    return !esVacioOUseless(item?.norma) && !esVacioOUseless(item?.valor);
+  });
+
+  if (filasUtiles.length === 0) {
+    resultado.innerHTML = `
+      ${html}
+      <tr><td colspan="2" class="text-muted">Sin requisitos con contenido para mostrar.</td></tr>
+      </tbody></table></div>`;
+    return;
+  }
+
+  // Render de filas útiles
+  filasUtiles.forEach((item) => {
+    const valorUp = norm(item.valor);
+    const icono = emojiPorNorma(item.norma, valorUp);
+
+    // Para "monto tope" anteponer $ si no lo trae
+    const mostrarValor =
+      icono === "💲" && !/^[$€]/.test(String(item.valor).trim())
+        ? `$ ${item.valor}`
+        : item.valor;
+
+    html += `
+      <tr>
+        <td>${item.norma}</td>
+        <td><span class="req-ico">${icono}</span> ${String(mostrarValor)
+      .toUpperCase()
+      .trim()}</td>
+      </tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  resultado.innerHTML = html;
 }
 
 function abrirModalAyudaIOMA() {
@@ -687,6 +730,107 @@ function ajustarMenuHamburguesa() {
     menuToggle.style.display = "block";
   }
 }
+
+// ===== Prestadores (scoped) =====
+window.Prestadores = (function () {
+  const ids = {
+    root: "prestadores-root",
+    obra: "prestadores-obra",
+    q: "prestadores-q",
+    search: "prestadores-search",
+    total: "prestadores-total",
+    tbody: "prestadores-tbody",
+    helpOpen: "prestadores-help-open",
+    help: "prestadores-help",
+    helpClose: "prestadores-help-close",
+    helpOk: "prestadores-help-ok",
+  };
+
+  function el(id) {
+    return document.getElementById(id);
+  }
+
+  async function buscar() {
+    const obra = el(ids.obra).value;
+    const q = el(ids.q).value || "";
+    const tbody = el(ids.tbody);
+    const totalEl = el(ids.total);
+    const btn = el(ids.search);
+
+    btn.disabled = true;
+    const prev = btn.textContent;
+    btn.textContent = "Buscando…";
+    tbody.innerHTML = `<tr><td class="prestadores-nores" colspan="2">Buscando…</td></tr>`;
+
+    try {
+      const url = `/api/prestadores?obra=${encodeURIComponent(
+        obra
+      )}&q=${encodeURIComponent(q)}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      totalEl.textContent = `${data.total || 0} resultados`;
+
+      if (!data.items || !data.items.length) {
+        tbody.innerHTML = `<tr><td class="prestadores-nores" colspan="2">Sin resultados</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.items
+        .map(
+          (r) => `
+        <tr>
+          <td>${r.prestador ?? ""}</td>
+          <td style="white-space:nowrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;">
+            ${r.matricula ?? ""}
+          </td>
+        </tr>
+      `
+        )
+        .join("");
+    } catch (e) {
+      console.error(e);
+      tbody.innerHTML = `<tr><td class="prestadores-nores" colspan="2" style="color:#ff6b6b">Error consultando. Probá de nuevo.</td></tr>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = prev;
+    }
+  }
+
+  function openHelp() {
+    el(ids.help).style.display = "block";
+  }
+  function closeHelp() {
+    el(ids.help).style.display = "none";
+  }
+
+  function init() {
+    if (!el(ids.root)) return; // no estoy en esta página
+
+    el(ids.search).addEventListener("click", buscar);
+    el(ids.q).addEventListener("keydown", (e) => {
+      if (e.key === "Enter") buscar();
+    });
+
+    const open = el(ids.helpOpen),
+      close = el(ids.helpClose),
+      ok = el(ids.helpOk);
+    if (open) open.addEventListener("click", openHelp);
+    if (close) close.addEventListener("click", closeHelp);
+    if (ok) ok.addEventListener("click", closeHelp);
+
+    setTimeout(() => el(ids.q).focus(), 150);
+  }
+
+  return { init };
+})();
+
+// auto-init sin romper otras páginas
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.Prestadores && typeof window.Prestadores.init === "function") {
+    window.Prestadores.init();
+  }
+});
 
 window.addEventListener("resize", ajustarMenuHamburguesa);
 window.addEventListener("DOMContentLoaded", ajustarMenuHamburguesa);
