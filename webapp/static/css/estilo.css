@@ -2193,3 +2193,36 @@ body {
   text-align: right;
   margin-top: 12px;
 }
+.btn-herramienta-disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  border: 1px solid #aaa;
+  opacity: 0.7;
+  position: relative;
+}
+
+.btn-herramienta-disabled:hover {
+  background-color: #ccc;
+}
+
+.btn-herramienta-disabled::after {
+  content: "Próximamente";
+  position: absolute;
+  top: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.btn-herramienta-disabled:hover::after {
+  opacity: 1;
+}
