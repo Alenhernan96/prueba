@@ -13,7 +13,8 @@ pdf2image
 Pillow
 pyzbar
 
-# Dependencias para harvester, si se usan:
-numpy==1.26.4
-opencv-python-headless==4.10.0.84
-PyMuPDF==1.24.9
+# Dependencias para harvester, si se usan
+numpy
+opencv-python-headless
+PyMuPDF
+
