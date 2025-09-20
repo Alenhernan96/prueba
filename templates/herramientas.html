@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tecno CF - Herramientas</title>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/estilo.css') }}"
+    />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-VJDF2QPWBP"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-VJDF2QPWBP");
+    </script>
+  </head>
+  <body>
+    {% include 'header.html' %}
+
+    <section class="intro-herramientas">
+      <h2>¿Qué es Tecno CF Herramientas?</h2>
+      <p>
+        Reunimos utilidades digitales para <strong>ahorrar tiempo</strong>,
+        <strong>reducir errores</strong> y
+        <strong>automatizar procesos</strong>, especialmente en el ámbito
+        farmacéutico.
+      </p>
+      <p>
+        Nacen de experiencias reales y están pensadas para resolver tareas
+        repetitivas de forma rápida y simple. 🚀
+      </p>
+      <p>¿Tenés una idea útil? Escribinos por WhatsApp! 📲</p>
+    </section>
+
+    <section class="menu-principal">
+      <div class="menu-herramientas">
+        <a href="/ioma" class="btn-herramienta">
+          <i class="fas fa-calculator"></i> Calculadora IOMA
+        </a>
+        <a href="/requisitos" class="btn-herramienta">
+          <i class="fas fa-list-check"></i> Requisitos Obras Sociales
+        </a>
+        <a href="/galeno" class="btn-herramienta">
+          <i class="fas fa-pen-to-square"></i> Procesador Galeno Crónicos
+        </a>
+        <a href="/prestadores" class="btn-herramienta">
+          <i class="fas fa-hospital"></i> Buscador de Prestadores
+        </a>
+        <a href="/extractor" class="btn-herramienta">
+          <i class="fas fa-qrcode"></i> Validador de Recetas OCR
+        </a>
+      </div>
+    </section>
+
+    {% include 'footer.html' %}
+  </body>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</html>

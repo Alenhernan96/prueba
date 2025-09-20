@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tecno CF - Extractor de Recetas</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/estilo.css') }}"
+    />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    {% include 'header.html' %}
+
+    <main class="extractor-page-main">
+      <div class="extractor-container">
+        <div id="form-container">
+          <h2><i class="fas fa-file-invoice"></i> Validador de Recetas OCR</h2>
+          <p class="extractor-intro">
+            Sube una imagen (JPG, PNG) o un documento PDF de una receta médica
+            para analizarla.
+          </p>
+          <form id="uploadForm">
+            <div class="opciones-proceso">
+              <label>
+                <input type="radio" name="proceso" value="normativa" checked />
+                <span><i class="fas fa-tasks"></i> Solo Validar Normativa</span>
+              </label>
+              <label>
+                <input type="radio" name="proceso" value="vademecum" />
+                <span><i class="fas fa-pills"></i> Validar con Troqueles</span>
+              </label>
+              <label>
+                <input type="radio" name="proceso" value="full" />
+                <span
+                  ><i class="fas fa-receipt"></i> Proceso Completo (con
+                  Ticket)</span
+                >
+              </label>
+            </div>
+
+            <input
+              type="file"
+              id="recetaFile"
+              name="documento_completo"
+              accept=".pdf,.jpg,.jpeg,.png"
+              required
+            />
+            <button type="submit" id="submitBtn" class="requerimientos-boton">
+              <i class="fas fa-cogs"></i> Procesar y Validar
+            </button>
+          </form>
+        </div>
+
+        <div id="spinner-container" style="display: none">
+          <i class="fas fa-spinner fa-spin fa-3x"></i>
+          <p>Procesando, por favor espera...</p>
+        </div>
+
+        <div id="results-display" style="display: none"></div>
+        <pre id="json-output" style="display: none"></pre>
+      </div>
+    </main>
+
+    {% include 'footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>
