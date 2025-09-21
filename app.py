@@ -7,6 +7,7 @@ from flask import (
     redirect,
     send_from_directory,
 )
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from datetime import datetime, date
 import pandas as pd
 import unicodedata
@@ -34,6 +35,13 @@ from core.comparador import comparar_receta_ticket_inteligente
 
 # Cargar variables del archivo .env
 load_dotenv()
+
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
 app = Flask(__name__)
 app.secret_key = "tu_clave_secreta_segura"
@@ -115,6 +123,13 @@ def requisitos():
 @app.route("/prestadores")
 def prestadores_page():
     return render_template("prestadores.html", obras=list(OBRAS_ARCHIVOS.keys()))
+
+
+@app.route("/extractor")
+@login_required
+def extractor():
+    """Muestra la página principal del extractor de recetas."""
+    return render_template("extractor.html")
 
 
 # ========== LÓGICA: CALCULADORA IOMA ==========
@@ -736,12 +751,6 @@ def api_prestadores():
     return jsonify({"total": int(res.shape[0]), "items": items})
 
 
-@app.route("/extractor")
-def extractor():
-    """Muestra la página principal del extractor de recetas."""
-    return render_template("extractor.html")
-
-
 @app.route("/extract", methods=["POST"])
 def handle_extraction():
     """Maneja la lógica de extracción de la imagen subida."""
@@ -852,6 +861,45 @@ def handle_extraction():
     finally:
         if os.path.exists(filepath):
             os.remove(filepath)
+
+
+# --- RUTAS DE LOGIN Y LOGOUT (MODIFICADAS) ---
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        # Comparamos directamente con las variables de entorno
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            user = User(id="1")  # Creamos nuestro usuario genérico
+            login_user(user)
+            return redirect(url_for("herramientas"))
+        else:
+            flash("Usuario o contraseña incorrectos.", "danger")
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("index"))
+
+
+# Creamos una clase de Usuario simple, solo para la sesión
+class User(UserMixin):
+    def __init__(self, id):
+        self.id = id
+
+
+# Función para cargar el usuario. Como solo hay uno, es muy simple.
+@login_manager.user_loader
+def load_user(user_id):
+    if user_id == "1":
+        return User(user_id)
+    return None
 
 
 # ========== EJECUCIÓN ==========
