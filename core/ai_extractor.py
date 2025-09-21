@@ -70,7 +70,7 @@ Instrucciones de extracción detalladas:
 
 
 def extract_all_data_from_image(file_path: str):
-    print("-> Usando Extractor Maestro de Gemini AI (Proceso Completo)...")
+    print("-> Usando Proceso Completo...")
     prompt = (
         "Analiza la imagen que contiene una RECETA y un TICKET.\n"
         + BASE_PROMPT
@@ -84,7 +84,7 @@ def extract_all_data_from_image(file_path: str):
 
 
 def extract_receta_data_from_image(file_path: str):
-    print("-> Usando Extractor de Gemini AI (Solo Receta)...")
+    print("-> Usando Solo Receta...")
     prompt = (
         "Analiza la imagen, ignora por completo cualquier ticket o factura de compra.\n"
         + BASE_PROMPT

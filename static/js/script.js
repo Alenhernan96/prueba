@@ -892,8 +892,79 @@ function renderResults(data) {
       text: "Verificación Incompleta",
     },
   };
-  const statusInfo =
+
+  let statusInfo =
     statusMap[validation.estado_general] || statusMap["NO VERIFICADO"];
+
+  // INICIO MODIFICACIÓN: Forzar "Receta NO Válida" y añadir observación
+  let forzarNoValida = false;
+  let motivoFallo = "";
+
+  if (barcodeData && barcodeData.length > 0) {
+    const hayInconsistenciaTroquel = barcodeData.some((item) => {
+      if (item.estado === "ENCONTRADO" && iaData.productos) {
+        const vademecumMonodroga = (item.datos.MONODROGA || "")
+          .toLowerCase()
+          .trim();
+        const vademecumDescripcion = (item.datos.DESCRIPCION || "")
+          .toLowerCase()
+          .trim();
+        const isMatch = iaData.productos.some((p) => {
+          const prescribedDesc = p.descripcion.toLowerCase().trim();
+          const vademecumBrand = vademecumDescripcion.split(" ")[0];
+          const prescribedBrand = prescribedDesc.split(" ")[0];
+          const matchesDescription =
+            vademecumBrand &&
+            prescribedBrand &&
+            vademecumBrand === prescribedBrand;
+          const drugComponents = vademecumMonodroga.split("+");
+          const matchesMonodroga =
+            vademecumMonodroga &&
+            drugComponents.every((component) =>
+              prescribedDesc.includes(component.trim())
+            );
+          return matchesDescription || matchesMonodroga;
+        });
+        return !isMatch;
+      }
+      return false;
+    });
+
+    if (hayInconsistenciaTroquel) {
+      forzarNoValida = true;
+      motivoFallo =
+        "El producto escaneado (troquel) no coincide con la prescripción.";
+    }
+  }
+
+  if (!forzarNoValida && comparisonData) {
+    const estadoTicket = comparisonData.estado_general;
+    if (
+      estadoTicket === "SIN_COINCIDENCIAS" ||
+      estadoTicket === "COINCIDENCIA_PARCIAL"
+    ) {
+      forzarNoValida = true;
+      motivoFallo = "Los datos del ticket no coinciden con los de la receta.";
+    }
+  }
+
+  if (forzarNoValida) {
+    statusInfo = statusMap["NO CUMPLE"];
+
+    // --> LÓGICA MEJORADA PARA AÑADIR LA OBSERVACIÓN
+    if (motivoFallo) {
+      let currentObs = validation.observaciones || [];
+      // Filtrar el mensaje placeholder si existe
+      currentObs = currentObs.filter((obs) => obs !== "Sin observaciones.");
+      // Añadir el nuevo motivo solo si no está ya incluido
+      if (!currentObs.includes(motivoFallo)) {
+        currentObs.push(motivoFallo);
+      }
+      // Reasignar el array modificado
+      validation.observaciones = currentObs;
+    }
+  }
+  // FIN MODIFICACIÓN
 
   container.innerHTML = `
     <div class="results-display-container">
@@ -908,7 +979,6 @@ function renderResults(data) {
       <div class="results-grid-full-width" id="results-grid-bottom"></div>
     </div>`;
 
-  // Llenar las columnas y secciones
   const colLeft = document.getElementById("results-column-left");
   const colRight = document.getElementById("results-column-right");
   const bottomGrid = document.getElementById("results-grid-bottom");
@@ -920,7 +990,6 @@ function renderResults(data) {
     validation.observaciones
   );
 
-  // Columna Izquierda
   colLeft.innerHTML += createCard(
     '<i class="fas fa-user-circle"></i> Datos de la Receta',
     generatePatientDataHTML(iaData)
@@ -936,7 +1005,6 @@ function renderResults(data) {
     );
   }
 
-  // Columna Derecha
   colRight.innerHTML += createCard(
     '<i class="fas fa-tasks"></i> Checklist de Normativa',
     generateValidationTableHTML(validation)
@@ -948,12 +1016,10 @@ function renderResults(data) {
     );
   }
 
-  // Fila Inferior
   if (comparisonData) {
     bottomGrid.innerHTML += generateComparisonHTML(comparisonData);
   }
 
-  // Al final de todos los resultados, añade el botón para subir nueva receta
   container.innerHTML += `
     <div class="center-content" style="margin-top: 30px;">
       <button id="uploadNewRecetaBtn" class="requerimientos-boton">
@@ -962,7 +1028,6 @@ function renderResults(data) {
     </div>
   `;
 
-  // Añade el event listener para el nuevo botón
   document
     .getElementById("uploadNewRecetaBtn")
     .addEventListener("click", resetApplication);
@@ -1356,20 +1421,24 @@ function generateDataList(fields) {
 }
 
 function generateObservationsHTML(observations) {
-  if (
-    !observations ||
-    observations.length === 0 ||
-    observations[0] === "Sin observaciones."
-  )
+  // Primero, nos aseguramos de que haya un array y filtramos mensajes vacíos o placeholders.
+  const validObservations = (observations || []).filter(
+    (obs) => obs && obs.trim() !== "" && obs.trim() !== "Sin observaciones."
+  );
+
+  // Si después de filtrar no queda nada, no mostramos la tarjeta.
+  if (validObservations.length === 0) {
     return "";
+  }
+
+  // Si hay observaciones válidas, creamos y devolvemos la tarjeta.
   return createCard(
     '<i class="fas fa-exclamation-triangle"></i> Observaciones',
-    `<ul class="observations-list">${observations
+    `<ul class="observations-list">${validObservations
       .map((obs) => `<li><i class="fas fa-angle-right"></i> ${obs}</li>`)
       .join("")}</ul>`,
     "observations"
   );
 }
-
 window.addEventListener("resize", ajustarMenuHamburguesa);
 window.addEventListener("DOMContentLoaded", ajustarMenuHamburguesa);
